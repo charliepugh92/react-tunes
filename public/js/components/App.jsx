@@ -15,36 +15,38 @@ var App = React.createClass({
 		this.setState({
 			offset: 0,
 			searchValue: searchValue
-		});
+		}, function () {
+			if (this.state.searchValue != '') {
+				// build the url string
+				var albums_url = "https://api.spotify.com/v1/search?limit=21&offset=0&type=album,artist&q=artist:" + encodeURIComponent(this.state.searchValue);
+				// make the api call
+				var self = this;
 
-		if (this.state.searchValue != '') {
-			// build the url string
-			var albums_url = "https://api.spotify.com/v1/search?limit=21&offset=0&type=album,artist&q=artist:" + encodeURIComponent(this.state.searchValue);
-			// make the api call
-			var self = this;
+				$.ajax(albums_url).done(function(res){
 
-			$.ajax(albums_url).done(function(res){
+					self.setState({
+						albums: res.albums.items,
+						artist: res.artists.items[0],
+						count: res.albums.total,
+						image: res.artists.items[0].images[0].url,
+						search: 1
+					});
 
-				self.setState({
-					albums: res.albums.items,
-					artist: res.artists.items[0],
-					count: res.albums.total,
-					image: res.artists.items[0].images[0].url,
-					search: 1
 				});
 
-			});
+			} else {
 
-		} else {
+				this.setState({
+					albums: [],
+					artist: [],
+					count: "",
+					image: "",
+					search: false
+				});
+			}
+		});
 
-			this.setState({
-				albums: [],
-				artist: [],
-				count: "",
-				image: "",
-				search: false
-			});
-		}
+
 	},
 	onLoadMore: function() {
 
